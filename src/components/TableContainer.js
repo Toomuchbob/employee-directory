@@ -1,19 +1,19 @@
 import React, { Component } from "react";
 import Table from "./Table";
 import employee from "./employee.json";
+import emp from "./employee.json";
 import Navbar from "./Navbar";
 
 class TableContainer extends Component {
     state = {
         employee: employee,
-        asc: true
+        asc: true,
+        lastName: ""
     }
 
-    sort = (arr, asc, prop) => {
-        console.log(prop);
+    sort = (arr, asc) => {
         if (asc) {
             arr.sort((a, b) => {
-                console.log(a["name"]["first"])
                 if (a.name.last < b.name.last) {
                     return -1;
                 }
@@ -35,19 +35,33 @@ class TableContainer extends Component {
         }
     };
 
-    handleSort = event => {
+    handleSort = () => {
         let asc = this.state.asc;
-        console.log(event.target.getAttribute("data"));
         this.setState({
-            employee: this.sort(employee, asc, event.target.getAttribute("data")),
+            employee: this.sort(employee, asc),
             asc: !asc
         });
+    };
+
+    handleInputChange = event => {
+        const value = event.target.value;
+        this.setState({ lastName: value });
+        let newMap = JSON.parse(JSON.stringify(emp));
+        newMap = this.state.employee.filter(e => e.name.last.toUpperCase()
+            .includes(this.state.lastName.toUpperCase()));
+        this.setState({ employee: newMap });
     };
 
     render() {
         return (
             <>
-                <Navbar brand="Employee Directory" />
+                <Navbar
+                    value={this.state.lastName}
+                    name="lastName"
+                    onChange={this.handleInputChange}
+                    type="text"
+                    placeholder="Search By Last Name"
+                />
                 <div className="container mt-5">
                     <Table data={employee} handleSort={this.handleSort} />
                 </div>
